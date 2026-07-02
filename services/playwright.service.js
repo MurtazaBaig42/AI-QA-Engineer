@@ -1,7 +1,7 @@
 const artifactManager = require("../utils/artifactManager");
 const { chromium } = require("playwright");
 
-exports.run = async (url) => {
+exports.run = async (request) => {
 
     let browser;
     let context;
@@ -62,7 +62,7 @@ exports.run = async (url) => {
         // -------------------------
         // Open Website
         // -------------------------
-        await page.goto(url, {
+        await page.goto(request.url, {
             waitUntil: "networkidle",
             timeout: 60000
         });

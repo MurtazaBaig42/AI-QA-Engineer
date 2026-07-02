@@ -1,23 +1,35 @@
 const playwrightService = require("../services/playwright.service");
+const executionRequest = require("../models/executionRequest");
 
 exports.runTest = async (req, res) => {
 
-    try {
+    console.log("========== REQUEST BODY ==========");
+    console.log(req.body);
+    console.log("==================================");
 
-        const result = await playwrightService.run(req.body.url);
+    const validation =
+        executionRequest.validateExecutionRequest(req.body);
 
-        res.json(result);
+    if (!validation.valid) {
+
+        return res.status(400).json({
+            status: "failed",
+            errors: validation.errors
+        });
 
     }
 
-    catch (error) {
+    try {
+
+        const result = await playwrightService.run(req.body);
+
+        res.json(result);
+
+    } catch (error) {
 
         res.status(500).json({
-
             status: "failed",
-
             error: error.message
-
         });
 
     }
