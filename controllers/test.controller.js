@@ -1,5 +1,7 @@
 const playwrightService = require("../services/playwright.service");
 const executionRequest = require("../models/executionRequest");
+const aiService = require("../services/ai/ai.service");
+const evidenceService = require("../services/evidence.service");
 
 exports.runTest = async (req, res) => {
 
@@ -22,8 +24,23 @@ exports.runTest = async (req, res) => {
     try {
 
         const result = await playwrightService.run(req.body);
+        // Build Evidence
+           const evidence =
+        await evidenceService.buildEvidence(result);
 
-        res.json(result);
+        // AI Analysis
+            const aiAnalysis =
+        await aiService.analyze(evidence);
+
+        res.json({
+
+    execution: result,
+
+    evidence,
+
+    aiAnalysis
+
+    });
 
     } catch (error) {
 

@@ -1,0 +1,26 @@
+# Node.js
+node_modules/
+
+# Environment Variables
+.env
+
+# Generated Artifacts
+artifacts/
+
+# Coverage
+coverage/
+
+# Temporary Files
+*.log
+*.tmp
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Playwright Reports
+playwright-report/
+test-results/
