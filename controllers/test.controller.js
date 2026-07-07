@@ -1,13 +1,10 @@
-const playwrightService = require("../services/playwright.service");
-const executionRequest = require("../models/executionRequest");
-const aiService = require("../services/ai/ai.service");
-const evidenceService = require("../services/evidence.service");
+const executionService =
+require("../services/execution/execution.service");
+
+const executionRequest =
+require("../models/executionRequest");
 
 exports.runTest = async (req, res) => {
-
-    console.log("========== REQUEST BODY ==========");
-    console.log(req.body);
-    console.log("==================================");
 
     const validation =
         executionRequest.validateExecutionRequest(req.body);
@@ -23,30 +20,21 @@ exports.runTest = async (req, res) => {
 
     try {
 
-        const result = await playwrightService.run(req.body);
-        // Build Evidence
-           const evidence =
-        await evidenceService.buildEvidence(result);
+        const result =
+            await executionService.execute(req.body);
 
-        // AI Analysis
-            const aiAnalysis =
-        await aiService.analyze(evidence);
+        res.json(result);
 
-        res.json({
+    }
 
-    execution: result,
-
-    evidence,
-
-    aiAnalysis
-
-    });
-
-    } catch (error) {
+    catch (error) {
 
         res.status(500).json({
+
             status: "failed",
+
             error: error.message
+
         });
 
     }
