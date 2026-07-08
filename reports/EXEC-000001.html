@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>AI QA Report</title>
+
+<style>
+
+body{
+
+font-family:Arial;
+
+margin:40px;
+
+background:#f7f7f7;
+
+}
+
+.card{
+
+background:white;
+
+padding:20px;
+
+margin-bottom:20px;
+
+border-radius:8px;
+
+box-shadow:0 0 8px rgba(0,0,0,.1);
+
+}
+
+h1{
+
+color:#333;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+td,th{
+
+border:1px solid #ddd;
+
+padding:10px;
+
+}
+
+th{
+
+background:#efefef;
+
+}
+
+pre{
+
+white-space:pre-wrap;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>AI QA REPORT</h1>
+
+<div class="card">
+
+<h2>Execution</h2>
+
+<table>
+
+<tr>
+
+<th>Status</th>
+
+<td>passed</td>
+
+</tr>
+
+<tr>
+
+<th>Execution ID</th>
+
+<td>EXEC-000001</td>
+
+</tr>
+
+<tr>
+
+<th>Title</th>
+
+<td>Google</td>
+
+</tr>
+
+<tr>
+
+<th>Screenshot</th>
+
+<td>screenshot-1783511818975.png</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h2>Evidence</h2>
+
+<pre>
+
+{
+    "executionId": "EXEC-000001",
+    "title": "Google",
+    "htmlSummary": {
+        "title": "Google",
+        "buttons": 9,
+        "forms": 1,
+        "inputs": 10,
+        "links": 19,
+        "images": 10
+    },
+    "screenshot": "screenshot-1783511818975.png",
+    "networkSummary": {
+        "totalRequests": 34,
+        "failedRequests": 0,
+        "clientErrors": 0,
+        "serverErrors": 0,
+        "failedUrls": []
+    },
+    "consoleSummary": {
+        "totalLogs": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "totalInfo": 0,
+        "errors": [],
+        "warnings": []
+    }
+}
+
+</pre>
+
+</div>
+
+<div class="card">
+
+<h2>AI Analysis</h2>
+
+<pre>
+
+{
+    "summary": "The application execution for the Google page shows a highly stable and functional state. There are no critical JavaScript errors, network failures, or console warnings observed. The HTML structure metrics (buttons, forms, inputs, links, images) appear consistent with a typical Google homepage. The primary area for potential improvement is a minor performance concern related to the number of network requests.",
+    "overallSeverity": "Low",
+    "overallScore": 95,
+    "findings": [
+        {
+            "title": "Potential Performance Optimization: High Number of Network Requests",
+            "severity": "Low",
+            "category": "Performance Concerns",
+            "rootCause": "The page initiated 34 network requests during its load. While all requests were successful with no client or server errors, a higher number of requests can potentially increase initial page load time and resource consumption, especially for users on slower network connections or mobile devices. For a highly optimized page like Google's homepage, opportunities might exist to reduce this count.",
+            "recommendation": "Analyze the network waterfall to identify specific resources that can be optimized. Consider strategies such as consolidating CSS/JavaScript files, optimizing image delivery (e.g., lazy loading, appropriate formats), leveraging browser caching more aggressively, or using HTTP/2 server push where applicable to reduce the total number of round trips required.",
+            "validation": {
+                "verified": false,
+                "failedRequests": 0,
+                "clientErrors": 0,
+                "serverErrors": 0
+            }
+        }
+    ]
+}
+
+</pre>
+
+</div>
+
+</body>
+
+</html>

@@ -1,29 +1,75 @@
+const browserManager = require("../browserManager.service");
 const playwrightService = require("../playwright.service");
-const evidenceService = require("../evidence/evidence.service");
+const evidenceService = require("../evidence.service");
 const aiService = require("../ai/ai.service");
+
+const findingValidator =
+require("../validation/findingValidator");
 
 exports.execute = async (request) => {
 
-    // Step 1
-    const execution =
-        await playwrightService.run(request);
+    let session;
 
-    // Step 2
-    const evidence =
-    evidenceService.buildEvidence(execution);
+    try {
 
-    // Step 3
-    const aiAnalysis =
-        await aiService.analyze(evidence);
+        // Browser Session
+        session =
+            await browserManager.createSession(request);
 
-    return {
+        // Playwright Execution
+        const execution =
+            await playwrightService.run(session, request);
 
-        execution,
+        // Evidence
+        const evidence =
+            evidenceService.buildEvidence(execution);
 
-        evidence,
+        // AI Analysis
+        const aiAnalysis =
+            await aiService.analyze(evidence);
 
-        aiAnalysis
+        // Validation
+        if (
+            aiAnalysis.findings &&
+            aiAnalysis.findings.length > 0
+        ) {
 
-    };
+            aiAnalysis.findings =
+                await findingValidator.validate(
+
+                    execution.page,
+
+                    aiAnalysis.findings,
+
+                    evidence
+
+                );
+
+        }
+
+        // Remove page object before response
+        delete execution.page;
+
+        return {
+
+            execution,
+
+            evidence,
+
+            aiAnalysis
+
+        };
+
+    }
+
+    finally {
+
+        if (session) {
+
+            await browserManager.closeSession(session);
+
+        }
+
+    }
 
 };

@@ -1,118 +1,96 @@
 const artifactManager = require("../utils/artifactManager");
-const { chromium } = require("playwright");
 
-exports.run = async (request) => {
+exports.run = async (session, request) => {
 
-    let browser;
-    let context;
+    console.log("========== EXECUTION REQUEST ==========");
+    console.log(request);
+    console.log("=======================================");
 
-    try {
+    const { page } = session;
 
-        // Launch Browser
-        browser = await chromium.launch({
-            headless: false,
-            channel: "chrome"
+    // Console Logs
+    const consoleLogs = [];
+
+    // Network Logs
+    const networkLogs = [];
+
+    page.on("console", (msg) => {
+
+        consoleLogs.push({
+
+            type: msg.type(),
+            text: msg.text()
+
         });
 
-        // Create Browser Context
-        context = await browser.newContext({
-            viewport: {
-                width: 1440,
-                height: 900
-            },
-            ignoreHTTPSErrors: true
+    });
+
+    page.on("request", (req) => {
+
+        networkLogs.push({
+
+            type: "request",
+            method: req.method(),
+            url: req.url()
+
         });
 
-        // Create New Page
-        const page = await context.newPage();
+    });
 
-        // -------------------------
-        // Console Logs
-        // -------------------------
-        const consoleLogs = [];
+    page.on("response", (res) => {
 
-        page.on("console", (msg) => {
-            consoleLogs.push({
-                type: msg.type(),
-                text: msg.text()
-            });
+        networkLogs.push({
+
+            type: "response",
+            status: res.status(),
+            url: res.url()
+
         });
 
-        // -------------------------
-        // Network Logs
-        // -------------------------
-        const networkLogs = [];
+    });
 
-        page.on("request", (request) => {
-            networkLogs.push({
-                type: "request",
-                method: request.method(),
-                url: request.url()
-            });
-        });
+    // Validate URL
+    if (!request.url) {
 
-        page.on("response", (response) => {
-            networkLogs.push({
-                type: "response",
-                status: response.status(),
-                url: response.url()
-            });
-        });
+        throw new Error("URL is missing from execution request.");
 
-        // -------------------------
-        // Open Website
-        // -------------------------
-        await page.goto(request.url, {
-            waitUntil: "networkidle",
-            timeout: 60000
-        });
-
-        // -------------------------
-        // Page Title
-        // -------------------------
-        const title = await page.title();
-
-        // -------------------------
-        // Save Screenshot
-        // -------------------------
-        const screenshotName = await artifactManager.saveScreenshot(page);
-
-        // -------------------------
-        // Save HTML
-        // -------------------------
-        const htmlName = await artifactManager.saveHTML(page);
-
-        // -------------------------
-        // Save Network Logs
-        // -------------------------
-        const networkFile = artifactManager.saveNetwork(networkLogs);
-
-        // -------------------------
-        // Close Context & Browser
-        // -------------------------
-        await context.close();
-        await browser.close();
-
-        return {
-            status: "passed",
-            title,
-            screenshot: screenshotName,
-            html: htmlName,
-            network: networkFile,
-            consoleLogs
-        };
-
-    } catch (error) {
-
-        if (context) {
-            await context.close().catch(() => {});
-        }
-
-        if (browser) {
-            await browser.close().catch(() => {});
-        }
-
-        throw error;
     }
+
+    // Open Website
+    await page.goto(request.url, {
+
+        waitUntil: "networkidle",
+        timeout: 60000
+
+    });
+
+    // Get Page Title
+    const title = await page.title();
+
+    // Save Artifacts
+    const screenshotName = await artifactManager.saveScreenshot(page);
+
+    const htmlName = await artifactManager.saveHTML(page);
+
+    const networkFile = artifactManager.saveNetwork(networkLogs);
+
+    // Return Execution Result
+    return {
+
+        status: "passed",
+
+        executionId: request.executionId,
+
+        title,
+
+        screenshot: screenshotName,
+
+        html: htmlName,
+
+        network: networkFile,
+
+        consoleLogs
+
+    };
 
 };

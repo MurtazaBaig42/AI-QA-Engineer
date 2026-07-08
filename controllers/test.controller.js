@@ -1,10 +1,12 @@
-const executionService =
-require("../services/execution/execution.service");
-
-const executionRequest =
-require("../models/executionRequest");
+const executionService = require("../services/execution/execution.service");
+const executionRequest = require("../models/executionRequest");
+const reportService =  require("../services/report/report.service");
 
 exports.runTest = async (req, res) => {
+
+    console.log("========== REQUEST BODY ==========");
+    console.log(req.body);
+    console.log("==================================");
 
     const validation =
         executionRequest.validateExecutionRequest(req.body);
@@ -12,8 +14,11 @@ exports.runTest = async (req, res) => {
     if (!validation.valid) {
 
         return res.status(400).json({
+
             status: "failed",
+
             errors: validation.errors
+
         });
 
     }
@@ -21,9 +26,18 @@ exports.runTest = async (req, res) => {
     try {
 
         const result =
-            await executionService.execute(req.body);
+await executionService.execute(req.body);
 
-        res.json(result);
+const reports =
+await reportService.generate(result);
+
+res.json({
+
+    ...result,
+
+    reports
+
+});
 
     }
 

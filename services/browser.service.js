@@ -1,15 +1,26 @@
-const { chromium } = require("playwright");
+const { chromium, firefox, webkit } = require("playwright");
 
-exports.launchBrowser = async () => {
+exports.launchBrowser = async (browserName = "chrome", headless = false) => {
 
-    const browser = await chromium.launch({
+    switch (browserName.toLowerCase()) {
 
-        headless: false,
+        case "firefox":
+            return await firefox.launch({
+                headless
+            });
 
-        channel: "chrome"
+        case "webkit":
+            return await webkit.launch({
+                headless
+            });
 
-    });
+        case "chrome":
+        default:
+            return await chromium.launch({
+                headless,
+                channel: "chrome"
+            });
 
-    return browser;
+    }
 
 };

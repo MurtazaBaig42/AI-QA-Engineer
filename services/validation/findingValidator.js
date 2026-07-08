@@ -1,6 +1,11 @@
-const validatorFactory = require("./validatorFactory");
+const validatorFactory =
+require("./validatorFactory");
 
-exports.validate = async (page, findings) => {
+exports.validate = async (
+    page,
+    findings,
+    evidence
+) => {
 
     const validatedFindings = [];
 
@@ -11,13 +16,31 @@ exports.validate = async (page, findings) => {
 
         if (!validator) {
 
-            validatedFindings.push(finding);
+            validatedFindings.push({
+
+                ...finding,
+
+                validation: {
+
+                    verified: false,
+
+                    reason:
+                        "No validator available."
+
+                }
+
+            });
+
             continue;
 
         }
 
         const result =
-            await validator.validate(page, finding);
+            await validator.validate(
+                page,
+                finding,
+                evidence
+            );
 
         validatedFindings.push({
 
